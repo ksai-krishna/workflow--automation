@@ -3,11 +3,8 @@ import { z } from "zod";
 
 const Env = z.object({
   DATABASE_URL: z.string().url(),
-  REDIS_URL: z.string(),
   PORT: z.coerce.number().default(4000),
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  REDDIS_HOST: z.string().optional(),
-  REDDIS_TOKEN: z.string().optional(),
   SMTP_HOST: z.string(),
   SMTP_PORT: z.string(),
   SMTP_USER: z.string(),

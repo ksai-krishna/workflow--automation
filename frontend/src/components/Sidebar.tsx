@@ -61,7 +61,10 @@ const Sidebar: React.FC = () => {
 
   const actionNodes = [
     { type: 'sendEmail', label: 'Send Email' },
-    { type: 'sendSlack', label: 'Send Slack Message' },   
+    { type: 'sendSlack', label: 'Send Slack Message' },
+    { type: 'Http Trigger', label: 'HTTP TRIGGER' },
+    { type: 'Parse CSV', label: 'Parse CSV' },
+    { type: 'Summarize Text', label: 'Summarize Text' },   
   ];
   
   const logicNodes = [
