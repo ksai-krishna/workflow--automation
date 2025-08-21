@@ -15,13 +15,6 @@ A node-based workflow automation platform inspired by n8n.
 * Send Email (SMTP/Nodemailer)
 * Send Slack Message (Incoming Webhook)
 * HTTP Request (GET/POST)
-* Parse CSV → JSON
-* Parse PDF → Text
-* S3: Get File
-* Summarize Text (OpenAI API or mock)
-* Run Script (JS/Python)
-* If Condition
-* Set Data
 
 ### Logic & Storage
 
