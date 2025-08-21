@@ -1,0 +1,43 @@
+.base-node {
+  padding: 10px;
+  border: 2px solid black;
+  border-radius: 5px;
+  background: #f0f0f0;
+  cursor: default;
+  position: relative;
+  min-width: 150px;
+}
+
+.base-node.manual {
+  background: #fff5e6;
+  cursor: pointer;
+}
+
+.label-container {
+  display: flex;
+  align-items: center;
+}
+
+.animate-bar {
+  margin-left: 10px;
+  width: 40px;
+  height: 6px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    90deg,
+    #f39c12,
+    #f39c12 6px,
+    #ffa726 6px,
+    #ffa726 12px
+  );
+  animation: moveLine 1s linear infinite;
+}
+
+@keyframes moveLine {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 0;
+  }
+}

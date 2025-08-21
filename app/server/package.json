@@ -1,0 +1,43 @@
+{
+  "name": "@automation-flow/server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev:server": "tsx watch src/index.ts",
+    "dev:worker": "tsx watch src/worker.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "migrate": "prisma migrate deploy",
+    "generate": "prisma generate --schema=prisma/schema.prisma",
+    "studio": "prisma studio",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.1.0",
+    "@prisma/client": "^6.14.0",
+    "@upstash/redis": "^1.35.3",
+    "axios": "^1.11.0",
+    "bullmq": "^5.58.0",
+    "dotenv": "^17.2.1",
+    "fastify": "^5.5.0",
+    "fastify-plugin": "^5.0.1",
+    "ioredis": "^5.7.0",
+    "jsx-runtime": "^1.2.0",
+    "nodemailer": "^7.0.5",
+    "pino": "^9.9.0",
+    "pino-pretty": "^13.1.1",
+    "resend": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "@types/node": "^24.3.0",
+    "@types/nodemailer": "^7.0.0",
+    "prisma": "^6.14.0",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.4",
+    "typescript": "^5.9.2"
+  }
+}

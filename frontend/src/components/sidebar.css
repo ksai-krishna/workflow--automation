@@ -1,0 +1,35 @@
+.sidebar {
+  width: 240px;
+  padding: 10px;
+  background: #eee;
+  border-right: 1px solid #ddd;
+  box-sizing: border-box;
+  overflow-y: auto;
+  height: 100vh;
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.node-item {
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 3px;
+  cursor: grab;
+  user-select: none;
+  font-weight: 500;
+}
+
+.node-item.trigger {
+  border: 1px solid #007acc;
+  background: #cfe3ff;
+}
+
+.node-item.action {
+  border: 1px solid #ff0072;
+  background: #ffd9e6;
+}
+    
