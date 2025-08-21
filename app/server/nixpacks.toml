@@ -1,0 +1,20 @@
+# app/server/nixpacks.toml
+
+[phases.setup]
+# Use Node.js version 20 (or match your development version)
+# You might need to adjust this based on what Render/Railway supports or your project
+pkgs = ["nodejs_20"]
+
+[phases.build]
+# Install dependencies, build TypeScript, and run Prisma migrations
+commands = [
+  "npm install",
+  "npm run build", # This runs `tsc -p tsconfig.json` as per your package.json
+  "npx prisma migrate deploy" # Apply database migrations
+]
+
+[start]
+# Command to start both your Fastify API server and the BullMQ worker concurrently.
+# This assumes your package.json's "start" script is configured like:
+# "start": "node dist/index.js & node dist/worker.js"
+cmd = "npm start"

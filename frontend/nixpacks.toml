@@ -1,0 +1,24 @@
+# frontend/nixpacks.toml
+
+[phases.setup]
+# Use Node.js version 20 (or match your development version)
+pkgs = ["nodejs_20"]
+
+[phases.build]
+# Install dependencies and build the Vite project
+commands = [
+  "npm install",
+  "npm run build" # This runs `vite build` as per your package.json
+]
+
+[start]
+# For static sites, the "start" command isn't usually needed by the host
+# as the built files are served directly. But if a command is required,
+# you could put something like a simple static file server.
+# However, for Vercel/Railway Static Apps, this might not be strictly necessary
+# as they serve the content of the output directory directly.
+cmd = "" # No specific start command needed for static serving
+
+[build]
+# Specify the output directory where Vite places the compiled static files
+output_directory = "dist"
