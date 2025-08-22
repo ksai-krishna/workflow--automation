@@ -9,7 +9,27 @@ import { customAlphabet } from "nanoid";
 import fastifyStatic from "@fastify/static";
 import path from "path";
 import { fileURLToPath } from 'url'
-import { runNode } from "./worker.js";
+import Papa from "papaparse";
+import stream from "stream";
+import { Client } from 'pg';
+
+
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+
+const fastify = Fastify({ logger: true });
+
+// AWS S3 client
+const s3 = new S3Client({ region: "us-east-1" });
+
+// Convert async iterable from AWS SDK into a Node stream
+const streamToString = async (readableStream: stream.Readable) => {
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of readableStream) {
+    chunks.push(typeof chunk === "string" ? Buffer.from(chunk) : chunk);
+  }
+  return Buffer.concat(chunks).toString("utf-8");
+};
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -205,6 +225,115 @@ app.post("/forms/:formId/submit", async (req, reply) => {
   }
 });
 
+app.post("/parse-csv", async (request, reply) => {
+  try {
+    const { s3Link } = request.body as { s3Link?: string };
+    if (!s3Link) return reply.code(400).send({ error: "s3Link is required" });
+
+    // Parse s3://bucket/key format
+    const match = s3Link.match(/^s3:\/\/([^\/]+)\/(.+)$/);
+    if (!match) return reply.code(400).send({ error: "Invalid S3 link" });
+
+    const [, Bucket, Key] = match;
+
+    const command = new GetObjectCommand({ Bucket, Key });
+    const response = await s3.send(command);
+
+    const csvText = await streamToString(response.Body as stream.Readable);
+
+    const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+    console.log("Parsed CSV data:", parsed.data);
+    return { rows: parsed.data, fields: parsed.meta.fields };
+  } catch (err: any) {
+    request.log.error(err, "CSV parse error");
+    return reply.code(500).send({ error: err.message });
+  }
+});
+
+
+app.post("/enrich", async (request, reply) => {
+  try {
+    const { rows } = request.body as { rows: any[] };
+    if (!rows || !Array.isArray(rows)) {
+      return reply.code(400).send({ error: "Input 'rows' must be an array." });
+    }
+
+    // 1. Filter out rows with null, undefined, or empty string values
+    const cleanedRows = rows.filter(row => {
+      // Check for discrepancies like age > 150
+      if (row.customer_age && parseInt(row.customer_age, 10) > 150) {
+        console.warn(`[API] Filtering out invalid row due to age:`, row);
+        return false;
+      }
+      // Check if any value in the row is null or an empty string
+      return Object.values(row).every(value => value !== null && value !== undefined && value !== '');
+    });
+
+    // 2. Apply enrichment logic to the cleaned data
+    const enrichedRows = cleanedRows.map((row: any) => {
+      let classification = "Low-Value";
+
+      // Classification logic based on income and purchases
+      // Use parseFloat or parseInt to ensure numerical comparison
+      const income = parseFloat(row.income);
+      const purchases = parseInt(row.purchases, 10);
+
+      if (income > 60000 && purchases > 5) {
+        classification = "High-Value";
+      }
+
+      return {
+        ...row,
+        classification,
+        enriched_at: new Date().toISOString(),
+      };
+    });
+
+    console.log("[API] Enriched data:", enrichedRows);
+    return { rows: enrichedRows };
+  } catch (err: any) {
+    request.log.error(err, "Enrichment API error");
+    return reply.code(500).send({ error: err.message });
+  }
+});
+
+app.post("/send-to-postgres", async (request, reply) => {
+  console.log("[API] Received request to send data to PostgreSQL.");
+  try {
+    const { tableName, rows } = request.body as { tableName: string; rows: any[] };
+
+    if (!env.PROCESSED_DB_URL) {
+      console.error("PROCESSED_DB_URL is not configured.");
+      return reply.code(500).send({ error: "PostgreSQL database URL is not configured." });
+    }
+    
+    console.log(`[API] Attempting to upload ${rows.length} records to PostgreSQL table: ${tableName}`);
+    
+    const client = new Client({
+      connectionString: env.PROCESSED_DB_URL,
+    });
+    
+    await client.connect();
+
+    for (const row of rows) {
+      const columns = Object.keys(row).join(", ");
+      const values = Object.values(row);
+      const placeholders = values.map((_, i) => `$${i + 1}`).join(", ");
+      const query = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders}) ON CONFLICT DO NOTHING;`;
+
+      await client.query(query, values);
+    }
+    
+    await client.end();
+    
+    console.log(`[API] Successfully uploaded ${rows.length} records to PostgreSQL table: ${tableName}`);
+    return { success: true, recordsCreated: rows.length };
+
+  } catch (err: any) {
+    console.error("[API] PostgreSQL API error during full operation.", err.message);
+    return reply.code(500).send({ error: err.message });
+  }
+});
 
 app.post("/request/:webhookId", async (req, reply) => {
   try {

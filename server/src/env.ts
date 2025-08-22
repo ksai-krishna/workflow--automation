@@ -17,9 +17,19 @@ const Env = z.object({
   SMTP_PASS: z.string().optional(),
   SMTP_FROM: z.string().optional(),
 
+
+  // Airtable
+  AIRTABLE_API_KEY: z.string().optional(),
+  AIRTABLE_BASE_ID: z.string().optional(),
+
+  // AWS
+  AWS_ACCESS_KEY_ID: z.string().optional(),
+  AWS_SECRET_ACCESS_KEY: z.string().optional(),
+  AWS_REGION: z.string().optional(),
   // Queues / Integrations
   RAILWAY_REDDIS_URL: z.string().optional(),
   SLACK_WEBHOOK_URL: z.string().optional(),
+  PROCESSED_DB_URL: z.string().url().optional(),
 });
 
 export const env = Env.parse(process.env);

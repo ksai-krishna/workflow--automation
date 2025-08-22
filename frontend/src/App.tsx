@@ -30,6 +30,10 @@ import EndNode from './components/EndNode';
 import SchedulerTriggerNode from './components/SchedulerTriggerNode';
 import HttpRequestNode from './components/HttpRequestNode';
 import WebhookingTriggerNode from './components/WebhookTriggerNode';
+import parseCSVNode from './components/ParseCsv';
+// import EnrichNode from './components/EnrichNode';
+import postgresNode from './components/PostgresNode';
+import slackNode from './components/SlackNode';
 
 export const API_URL = process.env.API_URL;
 const nodeTypes = {
@@ -46,13 +50,14 @@ const nodeTypes = {
   startNode: StartNode,
   endNode: EndNode,
   sendEmail: EmailNode,
-  sendSlack: BaseNode,
-  parseCSV: BaseNode,
+  sendSlack: slackNode,
+  parseCSV: parseCSVNode,
   parsePDF: BaseNode,
   s3GetFile: BaseNode,
   summarizeText: BaseNode,
-  runScript: BaseNode,
+  EnrichData: BaseNode,
   httpRequest: HttpRequestNode,
+  pushToNeon : postgresNode,
 };
 
 let id = 2;

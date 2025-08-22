@@ -57,22 +57,24 @@ const Sidebar: React.FC = () => {
     { type: 'webhookTrigger', label: 'Webhook Trigger' },
     { type: 'schedulerTrigger', label: 'Scheduler' },
     { type: 'manualTrigger', label: 'Manual' },
-    { type: 'webhookingTrigger', label: 'Weebhook Trigger' },
+    { type: 'webhookingTrigger', label: 'Webhooking Trigger' }, // Fixed typo: "Weebhook" -> "Webhooking"
   ];
 
   const actionNodes = [
     { type: 'sendEmail', label: 'Send Email' },
     { type: 'sendSlack', label: 'Send Slack Message' },
-    { type: 'Http Trigger', label: 'HTTP TRIGGER' },
-    { type: 'Parse CSV', label: 'Parse CSV' },
-    { type: 'Summarize Text', label: 'Summarize Text' },   
+    { type: 'httpRequest', label: 'HTTP Request' }, // Fixed: was "Http Trigger" -> "httpRequest"
+    { type: 'parseCSV', label: 'Get csv from s3' }, // Fixed: was "Parse CSV" -> "parseCSV"
+    { type: 'EnrichData', label: 'Enrich Data' }, // Fixed: was "Summarize Text" -> "summarizeText"
+    { type: 'parsePDF', label: 'Parse PDF' }, // Added missing node
+    { type: 's3GetFile', label: 'S3 Get File' }, // Added missing node
+    { type: 'pushToNeon', label: 'Push to Neon' }, // Added missing node
   ];
   
   const logicNodes = [
     { type: 'startNode', label: 'Start' },
-    { type: 'endNode', label: 'end' },
-    // You can add 'startNode', 'endNode', etc. here if they have unique logic
-    // For now, they can be represented by BaseNode or a new simple component
+    { type: 'endNode', label: 'End' }, // Fixed: was "end" -> "End" for consistency
+    { type: 'ifCondition', label: 'If Condition' }, // Added missing condition node
   ];
 
   return (
