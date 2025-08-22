@@ -126,6 +126,7 @@ exports.Prisma.WorkflowScalarFieldEnum = {
   nodes: 'nodes',
   edges: 'edges',
   formId: 'formId',
+  webhookId: 'webhookId',
   schedule: 'schedule',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

@@ -3,3 +3,5 @@ node_modules
 .env.*
 dist
 backend/
+docker-compose.yml
+Dockerfile

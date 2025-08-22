@@ -991,6 +991,7 @@ export namespace Prisma {
     id: string | null
     name: string | null
     formId: string | null
+    webhookId: string | null
     schedule: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -1000,6 +1001,7 @@ export namespace Prisma {
     id: string | null
     name: string | null
     formId: string | null
+    webhookId: string | null
     schedule: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -1011,6 +1013,7 @@ export namespace Prisma {
     nodes: number
     edges: number
     formId: number
+    webhookId: number
     schedule: number
     createdAt: number
     updatedAt: number
@@ -1022,6 +1025,7 @@ export namespace Prisma {
     id?: true
     name?: true
     formId?: true
+    webhookId?: true
     schedule?: true
     createdAt?: true
     updatedAt?: true
@@ -1031,6 +1035,7 @@ export namespace Prisma {
     id?: true
     name?: true
     formId?: true
+    webhookId?: true
     schedule?: true
     createdAt?: true
     updatedAt?: true
@@ -1042,6 +1047,7 @@ export namespace Prisma {
     nodes?: true
     edges?: true
     formId?: true
+    webhookId?: true
     schedule?: true
     createdAt?: true
     updatedAt?: true
@@ -1126,6 +1132,7 @@ export namespace Prisma {
     nodes: JsonValue
     edges: JsonValue
     formId: string | null
+    webhookId: string | null
     schedule: string | null
     createdAt: Date
     updatedAt: Date
@@ -1154,6 +1161,7 @@ export namespace Prisma {
     nodes?: boolean
     edges?: boolean
     formId?: boolean
+    webhookId?: boolean
     schedule?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1167,6 +1175,7 @@ export namespace Prisma {
     nodes?: boolean
     edges?: boolean
     formId?: boolean
+    webhookId?: boolean
     schedule?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1178,6 +1187,7 @@ export namespace Prisma {
     nodes?: boolean
     edges?: boolean
     formId?: boolean
+    webhookId?: boolean
     schedule?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -1189,12 +1199,13 @@ export namespace Prisma {
     nodes?: boolean
     edges?: boolean
     formId?: boolean
+    webhookId?: boolean
     schedule?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type WorkflowOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "nodes" | "edges" | "formId" | "schedule" | "createdAt" | "updatedAt", ExtArgs["result"]["workflow"]>
+  export type WorkflowOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "nodes" | "edges" | "formId" | "webhookId" | "schedule" | "createdAt" | "updatedAt", ExtArgs["result"]["workflow"]>
   export type WorkflowInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     executions?: boolean | Workflow$executionsArgs<ExtArgs>
     _count?: boolean | WorkflowCountOutputTypeDefaultArgs<ExtArgs>
@@ -1213,6 +1224,7 @@ export namespace Prisma {
       nodes: Prisma.JsonValue
       edges: Prisma.JsonValue
       formId: string | null
+      webhookId: string | null
       schedule: string | null
       createdAt: Date
       updatedAt: Date
@@ -1645,6 +1657,7 @@ export namespace Prisma {
     readonly nodes: FieldRef<"Workflow", 'Json'>
     readonly edges: FieldRef<"Workflow", 'Json'>
     readonly formId: FieldRef<"Workflow", 'String'>
+    readonly webhookId: FieldRef<"Workflow", 'String'>
     readonly schedule: FieldRef<"Workflow", 'String'>
     readonly createdAt: FieldRef<"Workflow", 'DateTime'>
     readonly updatedAt: FieldRef<"Workflow", 'DateTime'>
@@ -3165,6 +3178,7 @@ export namespace Prisma {
     nodes: 'nodes',
     edges: 'edges',
     formId: 'formId',
+    webhookId: 'webhookId',
     schedule: 'schedule',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -3298,6 +3312,7 @@ export namespace Prisma {
     nodes?: JsonFilter<"Workflow">
     edges?: JsonFilter<"Workflow">
     formId?: StringNullableFilter<"Workflow"> | string | null
+    webhookId?: StringNullableFilter<"Workflow"> | string | null
     schedule?: StringNullableFilter<"Workflow"> | string | null
     createdAt?: DateTimeFilter<"Workflow"> | Date | string
     updatedAt?: DateTimeFilter<"Workflow"> | Date | string
@@ -3310,6 +3325,7 @@ export namespace Prisma {
     nodes?: SortOrder
     edges?: SortOrder
     formId?: SortOrderInput | SortOrder
+    webhookId?: SortOrderInput | SortOrder
     schedule?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3319,6 +3335,7 @@ export namespace Prisma {
   export type WorkflowWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     formId?: string
+    webhookId?: string
     AND?: WorkflowWhereInput | WorkflowWhereInput[]
     OR?: WorkflowWhereInput[]
     NOT?: WorkflowWhereInput | WorkflowWhereInput[]
@@ -3329,7 +3346,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Workflow"> | Date | string
     updatedAt?: DateTimeFilter<"Workflow"> | Date | string
     executions?: ExecutionListRelationFilter
-  }, "id" | "formId">
+  }, "id" | "formId" | "webhookId">
 
   export type WorkflowOrderByWithAggregationInput = {
     id?: SortOrder
@@ -3337,6 +3354,7 @@ export namespace Prisma {
     nodes?: SortOrder
     edges?: SortOrder
     formId?: SortOrderInput | SortOrder
+    webhookId?: SortOrderInput | SortOrder
     schedule?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3354,6 +3372,7 @@ export namespace Prisma {
     nodes?: JsonWithAggregatesFilter<"Workflow">
     edges?: JsonWithAggregatesFilter<"Workflow">
     formId?: StringNullableWithAggregatesFilter<"Workflow"> | string | null
+    webhookId?: StringNullableWithAggregatesFilter<"Workflow"> | string | null
     schedule?: StringNullableWithAggregatesFilter<"Workflow"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Workflow"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Workflow"> | Date | string
@@ -3425,6 +3444,7 @@ export namespace Prisma {
     nodes: JsonNullValueInput | InputJsonValue
     edges: JsonNullValueInput | InputJsonValue
     formId?: string | null
+    webhookId?: string | null
     schedule?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -3437,6 +3457,7 @@ export namespace Prisma {
     nodes: JsonNullValueInput | InputJsonValue
     edges: JsonNullValueInput | InputJsonValue
     formId?: string | null
+    webhookId?: string | null
     schedule?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -3449,6 +3470,7 @@ export namespace Prisma {
     nodes?: JsonNullValueInput | InputJsonValue
     edges?: JsonNullValueInput | InputJsonValue
     formId?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
     schedule?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3461,6 +3483,7 @@ export namespace Prisma {
     nodes?: JsonNullValueInput | InputJsonValue
     edges?: JsonNullValueInput | InputJsonValue
     formId?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
     schedule?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3473,6 +3496,7 @@ export namespace Prisma {
     nodes: JsonNullValueInput | InputJsonValue
     edges: JsonNullValueInput | InputJsonValue
     formId?: string | null
+    webhookId?: string | null
     schedule?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -3484,6 +3508,7 @@ export namespace Prisma {
     nodes?: JsonNullValueInput | InputJsonValue
     edges?: JsonNullValueInput | InputJsonValue
     formId?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
     schedule?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3495,6 +3520,7 @@ export namespace Prisma {
     nodes?: JsonNullValueInput | InputJsonValue
     edges?: JsonNullValueInput | InputJsonValue
     formId?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
     schedule?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -3647,6 +3673,7 @@ export namespace Prisma {
     nodes?: SortOrder
     edges?: SortOrder
     formId?: SortOrder
+    webhookId?: SortOrder
     schedule?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3656,6 +3683,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     formId?: SortOrder
+    webhookId?: SortOrder
     schedule?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -3665,6 +3693,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     formId?: SortOrder
+    webhookId?: SortOrder
     schedule?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -4090,6 +4119,7 @@ export namespace Prisma {
     nodes: JsonNullValueInput | InputJsonValue
     edges: JsonNullValueInput | InputJsonValue
     formId?: string | null
+    webhookId?: string | null
     schedule?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -4101,6 +4131,7 @@ export namespace Prisma {
     nodes: JsonNullValueInput | InputJsonValue
     edges: JsonNullValueInput | InputJsonValue
     formId?: string | null
+    webhookId?: string | null
     schedule?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -4128,6 +4159,7 @@ export namespace Prisma {
     nodes?: JsonNullValueInput | InputJsonValue
     edges?: JsonNullValueInput | InputJsonValue
     formId?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
     schedule?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -4139,6 +4171,7 @@ export namespace Prisma {
     nodes?: JsonNullValueInput | InputJsonValue
     edges?: JsonNullValueInput | InputJsonValue
     formId?: NullableStringFieldUpdateOperationsInput | string | null
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
     schedule?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

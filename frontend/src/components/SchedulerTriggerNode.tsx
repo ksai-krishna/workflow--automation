@@ -8,7 +8,7 @@ interface SchedulerTriggerData {
   onNodeDataChange?: (id: string, newData: Partial<SchedulerTriggerData>) => void;
 }
 
-const SchedulerTriggerNode: React.FC<NodeProps<SchedulerTriggerData>> = ({ id, data, selected }) => {
+const SchedulerTriggerNode: React.FC<NodeProps<any>> = ({ id, data, selected }) => {
   const handleDataChange = (field: keyof SchedulerTriggerData, value: string | number) => {
     if (data.onNodeDataChange) {
       data.onNodeDataChange(id, { [field]: value });

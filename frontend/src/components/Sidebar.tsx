@@ -57,6 +57,7 @@ const Sidebar: React.FC = () => {
     { type: 'webhookTrigger', label: 'Webhook Trigger' },
     { type: 'schedulerTrigger', label: 'Scheduler' },
     { type: 'manualTrigger', label: 'Manual' },
+    { type: 'webhookingTrigger', label: 'Weebhook Trigger' },
   ];
 
   const actionNodes = [

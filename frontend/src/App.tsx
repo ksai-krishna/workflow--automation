@@ -1,3 +1,4 @@
+// frontend/app.tsx
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   ReactFlow,
@@ -28,15 +29,18 @@ import StartNode from './components/StartNode';
 import EndNode from './components/EndNode';
 import SchedulerTriggerNode from './components/SchedulerTriggerNode';
 import HttpRequestNode from './components/HttpRequestNode';
+import WebhookingTriggerNode from './components/WebhookTriggerNode';
 
-const API_URL = 'http://192.168.1.5:4000';
-
+export const API_URL = process.env.API_URL;
 const nodeTypes = {
+  // Fixed the mapping - now matches the type names used in drag/drop
+  webhookingTrigger: WebhookingTriggerNode,
   webhookTrigger: TriggerNode,
   schedulerTrigger: SchedulerTriggerNode,
   manualTrigger: (props: any) => (
     <TriggerNode {...props} data={{ ...props.data, isManualTrigger: true }} />
   ),
+  
   formTrigger: FormTriggerNode,
   ifCondition: ConditionNode,
   startNode: StartNode,
@@ -129,48 +133,68 @@ const App: React.FC = () => {
   );
 
   const handleManualTrigger = async (nodeId: string) => {
-    const node = nodes.find((n) => n.id === nodeId);
-    if (!node) return;
+  const node = nodes.find((n) => n.id === nodeId);
+  if (!node) return;
 
-    console.log(`Manually triggering node: ${node.id}, type: ${node.type}`, node.data);
+  console.log(`Manually triggering node: ${node.id}, type: ${node.type}`, node.data);
 
-    try {
-      if (node.type === 'sendEmail') {
-        await axios.post(`${API_URL}/send-email`, {
-          to: node.data.to,
-          subject: node.data.subject,
-          text: node.data.text,
-        });
-        alert('Email sent successfully!');
-      } else if (node.type === 'sendSlack') {
+  try {
+    if (node.type === 'sendEmail') {
+      await axios.post(`${API_URL}/send-email`, {
+        to: node.data.to,
+        subject: node.data.subject,
+        text: node.data.text,
+      });
+      alert('Email sent successfully!');
+    } else if (node.type === 'sendSlack') {
         await axios.post(`${API_URL}/send-slack`, {
-          text: node.data.text,
-        });
-        alert('Slack message sent successfully!');
-      } else if (node.type === 'httpRequest') {
-        const response = await axios({
-          method: node.data.method || 'GET',
-          url: node.data.url,
-        });
-        console.log('HTTP Response:', response.data);
-        alert('HTTP request successful! Check console for response.');
-      } else if (node.type === 'database') {
-        const response = await axios.post(`${API_URL}/test-db-connection`, {
-          dbType: node.data.dbType,
-          host: node.data.host,
-          port: node.data.port,
-          database: node.data.database,
-          username: node.data.username,
-          password: node.data.password,
-        });
-        console.log('DB Connection Response:', response.data);
-        alert('Database connection successful! 🎉');
-      }
+        text: node.data.text,
+      });
+      alert('Slack message sent successfully!');
+    } else if (node.type === 'httpRequest') {
+      const response = await axios({
+        method: node.data.method || 'GET',
+        url: node.data.url,
+      });
+      console.log('HTTP Response:', response.data);
+      alert('HTTP request successful! Check console for response.');
+    } else if (node.type === 'database') {
+      const response = await axios.post(`${API_URL}/test-db-connection`, {
+        dbType: node.data.dbType,
+        host: node.data.host,
+        port: node.data.port,
+        database: node.data.database,
+        username: node.data.username,
+        password: node.data.password,
+      });
+      console.log('DB Connection Response:', response.data);
+      alert('Database connection successful! 🎉');
+    } else if (node.type === 'webhookingTrigger') {
+  if (node.data.webhookUrl) {
+    try {
+      const testPayload = {
+        test: true,
+        message: 'Test webhook trigger',
+        timestamp: new Date().toISOString(),
+        name: 'Test User' // This will be used in Slack template
+      };
+      
+      const response = await axios.post(node.data.webhookUrl, testPayload);
+      console.log('Webhook test response:', response.data);
+      alert('Webhook triggered successfully! Check Slack for the message.');
     } catch (error: any) {
-      console.error(`Error executing node ${nodeId}`, error);
-      alert(`Error executing node ${node.type}: ${error.message}`);
+      console.error('Webhook test failed:', error);
+      alert(`Webhook test failed: ${error.response?.data?.error || error.message}`);
     }
-  };
+  } else {
+    alert('No webhook URL available. Save the workflow first.');
+  }
+    }
+  } catch (error: any) {
+    console.error(`Error executing node ${nodeId}`, error);
+    alert(`Error executing node ${node.type}: ${error.message}`);
+  }
+};
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -216,12 +240,18 @@ const App: React.FC = () => {
       }
 
       if (type === 'sendSlack') {
-        initialData.text = 'A form was filled out!';
+        initialData.text = `{{name}} has filled the form from workflow {{workflowName}}`;
       }
 
       if (type === 'httpRequest') {
         initialData.url = 'https://jsonplaceholder.typicode.com/posts/1';
         initialData.method = 'GET';
+      }
+
+      if (type === 'webhookingTrigger') {
+        const uniqueId = Math.random().toString(36).substring(2, 10);
+        initialData.webhookId = uniqueId;
+        initialData.webhookUrl = `${API_URL}/request/${uniqueId}`;
       }
 
       const newNode: Node = {
@@ -237,39 +267,64 @@ const App: React.FC = () => {
     [onLabelChange, onDelete, onNodeDataChange, nodes, edges]
   );
 
-  const saveWorkflow = async () => {
-    try {
-      const cleanNodes = nodes.map(({ id, type, position, data }) => ({ id, type, position, data }));
-      const cleanEdges = edges.map(({ id, source, target }) => ({ id, source, target }));
+const saveWorkflow = async () => {
+  try {
+    // Only keep clean node/edge info
+    const cleanNodes = nodes.map(({ id, type, position, data }) => ({
+      id,
+      type,
+      position,
+      data,
+    }));
+    const cleanEdges = edges.map(({ id, source, target }) => ({
+      id,
+      source,
+      target,
+    }));
 
-      const payload = {
-        name: workflowName,
-        nodes: cleanNodes,
-        edges: cleanEdges,
-      };
+    const payload = {
+      name: workflowName,
+      nodes: cleanNodes,
+      edges: cleanEdges,
+    };
 
-      const response = await axios.post(`${API_URL}/workflows`, payload);
-      const savedWorkflow = response.data;
+    const response = await axios.post(`${API_URL}/workflows`, payload);
+    const savedWorkflow = response.data;
 
-      setSavedWorkflowId(savedWorkflow.id);
+    setSavedWorkflowId(savedWorkflow.id);
 
-      if (savedWorkflow.formId) {
-        setNodes((nds) =>
-          nds.map((node) => {
-            if (node.type === 'formTrigger') {
-              return { ...node, data: { ...node.data, formId: savedWorkflow.formId } };
-            }
-            return node;
-          })
-        );
-      }
+    setNodes((nds) =>
+      nds.map((node) => {
+        if (node.type === "formTrigger") {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              workflowId: savedWorkflow.id,  
+              apiUrl: API_URL,
+              formId: savedWorkflow.formId || node.data.formId, // backend may generate
+            },
+          };
+        }
+        if (node.type === "webhookingTrigger" && node.data?.webhookId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              webhookUrl: `${API_URL}/request/${node.data.webhookId}`,
+            },
+          };
+        }
+        return node;
+      })
+    );
 
-      alert(`Workflow saved successfully! ID: ${savedWorkflow.id}`);
-    } catch (error) {
-      console.error('Failed to save workflow:', error);
-      alert('Error: Could not save workflow.');
-    }
-  };
+    alert(`Workflow saved successfully! ID: ${savedWorkflow.id}`);
+  } catch (error) {
+    console.error("Failed to save workflow:", error);
+    alert("Error: Could not save workflow.");
+  }
+};
 
   const loadWorkflows = async () => {
     try {
@@ -336,12 +391,28 @@ const App: React.FC = () => {
     }
 
     try {
-      // For each scheduler node, create an interval that calls your backend
-      nodes.forEach((node) => {
+      // Find all trigger nodes in the workflow
+      const triggerNodes = nodes.filter(node => 
+        node.type === 'schedulerTrigger' || 
+        node.type === 'manualTrigger' || 
+        node.type === 'formTrigger' || 
+        node.type === 'webhookingTrigger'
+      );
+
+      if (triggerNodes.length === 0) {
+        alert('No trigger nodes found in workflow.');
+        return;
+      }
+
+      let schedulersStarted = 0;
+      let immediateExecutions = 0;
+
+      // Handle each trigger type
+      for (const node of triggerNodes) {
         if (node.type === 'schedulerTrigger') {
           const value = Number(node.data?.scheduleValue || 0);
           const unit = (node.data?.scheduleUnit || 'minutes') as 'seconds' | 'minutes';
-          if (!value || value <= 0) return;
+          if (!value || value <= 0) continue;
 
           const intervalMs = unit === 'seconds' ? value * 1000 : value * 60000;
 
@@ -351,9 +422,10 @@ const App: React.FC = () => {
           }
 
           // Immediate kick-off
-          axios.post(`${API_URL}/workflows/${savedWorkflowId}/execute`).catch(console.error);
+          await axios.post(`${API_URL}/workflows/${savedWorkflowId}/execute`);
+          immediateExecutions++;
 
-          // Recurring
+          // Recurring schedule
           const timerId = window.setInterval(async () => {
             console.log(`Scheduler ${node.id}: executing workflow ${savedWorkflowId}`);
             try {
@@ -364,12 +436,46 @@ const App: React.FC = () => {
           }, intervalMs);
 
           schedulerIntervalsRef.current[node.id] = timerId;
+          schedulersStarted++;
+          
+        } else if (node.type === 'manualTrigger') {
+          // Execute immediately for manual triggers
+          await axios.post(`${API_URL}/workflows/${savedWorkflowId}/execute`);
+          immediateExecutions++;
+          
+        } else if (node.type === 'formTrigger' && node.data?.formId) {
+          // Form trigger is passive - just show the URL
+          console.log(`Form trigger ready: ${API_URL}/forms/${node.data.formId}`);
+          
+        } else if (node.type === 'webhookingTrigger' && node.data?.webhookUrl) {
+          // Webhook trigger is passive - just show the URL
+          console.log(`Webhook trigger ready: ${node.data.webhookUrl}`);
         }
-      });
+      }
 
-      const hasAny = Object.keys(schedulerIntervalsRef.current).length > 0;
-      setIsRunning(hasAny);
-      alert(hasAny ? 'Workflow execution started! Scheduler(s) active.' : 'No scheduler nodes found.');
+      setIsRunning(schedulersStarted > 0);
+
+      // Build status message
+      let message = [];
+      if (immediateExecutions > 0) {
+        message.push(`${immediateExecutions} workflow(s) executed immediately`);
+      }
+      if (schedulersStarted > 0) {
+        message.push(`${schedulersStarted} scheduler(s) started`);
+      }
+      
+      const formTriggers = triggerNodes.filter(n => n.type === 'formTrigger').length;
+      const webhookTriggers = triggerNodes.filter(n => n.type === 'webhookingTrigger').length;
+      
+      if (formTriggers > 0) {
+        message.push(`${formTriggers} form trigger(s) ready`);
+      }
+      if (webhookTriggers > 0) {
+        message.push(`${webhookTriggers} webhook trigger(s) ready`);
+      }
+
+      alert(message.length > 0 ? message.join(', ') + '!' : 'No active triggers found.');
+      
     } catch (error) {
       console.error('Failed to execute workflow:', error);
       alert('Error: Could not execute workflow.');
