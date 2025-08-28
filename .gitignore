@@ -5,3 +5,4 @@ dist
 backend/
 docker-compose.yml
 Dockerfile
+.vercel

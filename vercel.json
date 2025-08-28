@@ -1,0 +1,36 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "server/src/index.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "server/src/worker.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/server/src/index.ts"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/frontend/index.html"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/server/src/worker.ts",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
